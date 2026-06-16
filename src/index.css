@@ -1,0 +1,67 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-200 font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-accent text-ink-950;
+  }
+
+  /* Form controls baseline (dark) */
+  input,
+  select,
+  textarea {
+    @apply w-full rounded-xl border border-ink-700 bg-ink-850 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30;
+  }
+
+  label {
+    @apply mb-1.5 block text-sm font-medium text-slate-300;
+  }
+}
+
+@layer components {
+  /* Reusable layout container */
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8;
+  }
+
+  /* Section vertical rhythm */
+  .section {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  /* Subtle accent pill / eyebrow label */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent;
+  }
+}
+
+/* Custom scrollbar (dark) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0f1115;
+}
+::-webkit-scrollbar-thumb {
+  background: #2c3340;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4252;
+}
