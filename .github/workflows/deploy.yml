@@ -32,6 +32,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          GITHUB_PAGES: "true"
 
       # SPA fallback: GitHub Pages serves 404.html for unknown routes,
       # which re-loads the app so client-side routing keeps working.

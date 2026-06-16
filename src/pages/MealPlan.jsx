@@ -1,22 +1,42 @@
+import { useState } from "react";
 import PageHeader from "../components/PageHeader.jsx";
 import Card from "../components/Card.jsx";
 import Button from "../components/Button.jsx";
 import FormField from "../components/FormField.jsx";
-import ResultPlaceholder from "../components/ResultPlaceholder.jsx";
+import PlanResult from "../components/PlanResult.jsx";
 import AdPlaceholder from "../components/AdPlaceholder.jsx";
 import Disclaimer from "../components/Disclaimer.jsx";
-import { Salad } from "../components/Icons.jsx";
+import { Salad, Loader } from "../components/Icons.jsx";
+import { generatePlan } from "../services/geminiService.js";
 
 export default function MealPlan() {
-  // UI only — submission is intentionally disabled until AI is integrated.
-  const handleSubmit = (e) => e.preventDefault();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [plan, setPlan] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = Object.fromEntries(new FormData(e.target).entries());
+
+    setLoading(true);
+    setError("");
+    setPlan(null);
+    try {
+      const result = await generatePlan("meal", formData);
+      setPlan(result);
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
       <PageHeader
         eyebrow="Meal Plan"
         title="Build your meal plan"
-        subtitle="Tell us your preferences below. AI-powered meal generation will be added in the next step."
+        subtitle="Tell us your preferences and generate a customized meal plan powered by AI."
       />
 
       <section className="section">
@@ -124,28 +144,37 @@ export default function MealPlan() {
                 />
 
                 <div className="sm:col-span-2">
-                  {/* Disabled until AI generation is wired up. */}
                   <Button
                     type="submit"
                     size="lg"
-                    disabled
+                    disabled={loading}
                     className="w-full sm:w-auto"
                   >
-                    <Salad className="h-5 w-5" />
-                    Generate Meal Plan
+                    {loading ? (
+                      <>
+                        <Loader className="h-5 w-5 animate-spin" />
+                        Generating…
+                      </>
+                    ) : (
+                      <>
+                        <Salad className="h-5 w-5" />
+                        Generate Meal Plan
+                      </>
+                    )}
                   </Button>
-                  <p className="mt-2 text-xs text-slate-500">
-                    Generation is disabled in this preview build.
-                  </p>
                 </div>
               </form>
             </Card>
 
-            {/* Result placeholder */}
+            {/* Result */}
             <div className="mt-8">
-              <ResultPlaceholder
-                title="Your customized meal plan will appear here"
-                message="Your customized meal plan will appear here. AI generation will be added in the next step."
+              <PlanResult
+                type="meal"
+                loading={loading}
+                error={error}
+                plan={plan}
+                placeholderTitle="Your customized meal plan will appear here"
+                placeholderMessage="Fill in the form above and click Generate Meal Plan to get your AI-powered nutrition plan."
               />
             </div>
           </div>

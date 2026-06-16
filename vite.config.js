@@ -1,13 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// `base` only applies to production builds (GitHub Pages serves the app
-// under /AI-Fitness-Coach/). Local dev + preview use "/" so the app loads
-// at http://localhost:5173/ as expected.
-//
-// If you deploy elsewhere (Netlify/Vercel/custom domain), change the
-// production base to "/".
-export default defineConfig(({ command }) => ({
+// Base path handling:
+// - GitHub Pages serves the app under /AI-Fitness-Coach/, so the deploy
+//   workflow sets GITHUB_PAGES=true at build time.
+// - Vercel, Netlify, custom domains and local dev all serve at root ("/").
+const base = process.env.GITHUB_PAGES === "true" ? "/AI-Fitness-Coach/" : "/";
+
+export default defineConfig({
   plugins: [react()],
-  base: command === "build" ? "/AI-Fitness-Coach/" : "/",
-}));
+  base,
+});

@@ -1,22 +1,42 @@
+import { useState } from "react";
 import PageHeader from "../components/PageHeader.jsx";
 import Card from "../components/Card.jsx";
 import Button from "../components/Button.jsx";
 import FormField from "../components/FormField.jsx";
-import ResultPlaceholder from "../components/ResultPlaceholder.jsx";
+import PlanResult from "../components/PlanResult.jsx";
 import AdPlaceholder from "../components/AdPlaceholder.jsx";
 import Disclaimer from "../components/Disclaimer.jsx";
-import { Dumbbell } from "../components/Icons.jsx";
+import { Dumbbell, Loader } from "../components/Icons.jsx";
+import { generatePlan } from "../services/geminiService.js";
 
 export default function WorkoutPlan() {
-  // UI only — submission is intentionally disabled until AI is integrated.
-  const handleSubmit = (e) => e.preventDefault();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [plan, setPlan] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = Object.fromEntries(new FormData(e.target).entries());
+
+    setLoading(true);
+    setError("");
+    setPlan(null);
+    try {
+      const result = await generatePlan("workout", formData);
+      setPlan(result);
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
       <PageHeader
         eyebrow="Workout Plan"
         title="Design your workout plan"
-        subtitle="Fill in your details below. AI-powered plan generation will be added in the next step."
+        subtitle="Fill in your details and generate a personalized plan powered by AI."
       />
 
       <section className="section">
@@ -26,8 +46,7 @@ export default function WorkoutPlan() {
             <Card>
               <h2 className="text-xl font-bold text-white">Your details</h2>
               <p className="mt-1 text-sm text-slate-400">
-                The more accurate your inputs, the better your future plan will
-                be.
+                The more accurate your inputs, the better your plan will be.
               </p>
 
               <form
@@ -121,28 +140,37 @@ export default function WorkoutPlan() {
                 />
 
                 <div className="sm:col-span-2">
-                  {/* Disabled until AI generation is wired up. */}
                   <Button
                     type="submit"
                     size="lg"
-                    disabled
+                    disabled={loading}
                     className="w-full sm:w-auto"
                   >
-                    <Dumbbell className="h-5 w-5" />
-                    Generate Workout Plan
+                    {loading ? (
+                      <>
+                        <Loader className="h-5 w-5 animate-spin" />
+                        Generating…
+                      </>
+                    ) : (
+                      <>
+                        <Dumbbell className="h-5 w-5" />
+                        Generate Workout Plan
+                      </>
+                    )}
                   </Button>
-                  <p className="mt-2 text-xs text-slate-500">
-                    Generation is disabled in this preview build.
-                  </p>
                 </div>
               </form>
             </Card>
 
-            {/* Result placeholder */}
+            {/* Result */}
             <div className="mt-8">
-              <ResultPlaceholder
-                title="Your personalized workout plan will appear here"
-                message="Your personalized workout plan will appear here. AI generation will be added in the next step."
+              <PlanResult
+                type="workout"
+                loading={loading}
+                error={error}
+                plan={plan}
+                placeholderTitle="Your personalized workout plan will appear here"
+                placeholderMessage="Fill in the form above and click Generate Workout Plan to get your AI-powered routine."
               />
             </div>
           </div>
